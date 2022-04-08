@@ -39,8 +39,57 @@ class BloomFilter {
     }
 }
 
-
-
 const words =  fs.readFileSync('./words.txt', {encoding: 'utf8'}).toString().split("\n");
 const bloomFilter = new BloomFilter(words);
 bloomFilter.spellCheck("There are many circumstences were we need to find out if something is a menber of a set");
+
+// Binary search algorithm from previous exercise
+const binarySearch = (word) => {
+    let startIndex = 0;
+    let endIndex = words.length;
+    while(startIndex !== endIndex) {
+        let middleIndex = startIndex + Math.floor((endIndex - startIndex) / 2);
+
+        if (startIndex === middleIndex) {
+            if (words[endIndex] === word) {
+                return true;
+            } else {
+                break;
+            }
+        }
+
+        if (words[middleIndex] === word) {
+            return word;
+        } else if (words[middleIndex] < word) {
+            startIndex = middleIndex;
+        } else if (words[middleIndex] > word) {
+            endIndex = middleIndex;
+        } else {
+            return 'ERROR';
+        }
+    }
+    return false;
+}
+
+const lookForFalsePositives = (bloomFilter) => {
+    function makeWord(length) {
+        let result = '';
+        const characters = 'abcdefghijklmnopqrstuvwxyz';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
+    for (let i = 0; i < 100000; i ++) {
+        const word = makeWord(5);
+        if (bloomFilter.isInWords(word) && !binarySearch(word)) {
+            console.log(word);
+        }
+    }
+}
+
+lookForFalsePositives(bloomFilter);
+
+// Known false positives: tnfqm, actlm, rojbx, kaiyx, ptjrp, vwjct, amlwq, yviel, lkyov, kdkkb, fdjxx, xgjsc
